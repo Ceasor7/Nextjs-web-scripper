@@ -1,0 +1,18 @@
+{
+    "sourceFile": ".history/scrape_20221018142822.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1669536154195,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1669536154195,
+            "name": "Commit-0",
+            "content": "const axios = require('axios');\r\nconst cheerio = require('cheerio');\r\nrequire('dotenv').config();\r\nconst accountSid = process.env.TWILIO_ACCOUNT_SID;\r\nconst authToken = process.env.TWILIO_AUTH_TOKEN;\r\n\r\nconst client = require('twilio')(accountSid, authToken);\r\n\r\nconst url =\r\n  'https://www.amazon.co.uk/Flash-Furniture-Round-Aluminum-Indoor-Outdoor/dp/B00ZADCG22/ref=sr_1_2_sspa?c=ts&keywords=Tables&qid=1666092434&qu=eyJxc2MiOiI3Ljc0IiwicXNhIjoiNi45NCIsInFzcCI6IjYuMDAifQ%3D%3D&s=kitchen&sr=1-2-spons&ts_id=200995031&psc=1';\r\n\r\nconst product = { name: '', price: '', link: '' };\r\n\r\nasync function scrape() {\r\n  const { data } = await axios.get(url);\r\n\r\n  //load up the html\r\n  const $ = cheerio.load(data);\r\n  const item = $('div#dp-container');\r\n\r\n  product.name = $(item).find('h1 span#productTitle').text();\r\n  product.link = url;\r\n  const price = $(item)\r\n    .find('span .a-price-whole')\r\n    .first()\r\n    .text()\r\n    .replace(/[,.]/g, '');\r\n\r\n  const priceNum = parseInt(price);\r\n  product.price = priceNum;\r\n  console.log(product);\r\n\r\n  //send an sms\r\n  if (priceNum < 195) {\r\n    client.messages\r\n      .create({\r\n        body: `The price of ${product.name} went below ${price}. Purchase it at ${product.link}`,\r\n        from: '+13464820746',\r\n        to: '+254 708 234571',\r\n      })\r\n      .then((message) => {\r\n        console.log(message);\r\n        //clearInterval(handle);\r\n      });\r\n  }\r\n}\r\n\r\nscrape();\r\n"
+        }
+    ]
+}
